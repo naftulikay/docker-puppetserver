@@ -1,0 +1,9 @@
+---
+ - name: install docker repository
+   copy: src=docker.repo dest=/etc/yum.repos.d/docker.repo owner=root group=root mode=0644
+ - name: install docker
+   yum: name=docker-engine state=latest
+   notify:
+       - restart docker
+ - name: start docker
+   service: name=docker state=started enabled=yes

@@ -1,0 +1,16 @@
+---
+ - name: install puppet server repo
+   command: rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
+   args:
+       creates: /etc/yum.repos.d/puppetlabs.repo
+ - name: install puppet agent repo
+   command: rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+   args:
+       creates: /etc/yum.repos.d/puppetlabs-pc1.repo
+ - name: install puppet packages
+   yum: name={{ item }} state=latest
+   with_items:
+       - puppet-agent
+       - puppetserver
+       - facter
+       - hiera
