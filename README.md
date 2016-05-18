@@ -8,14 +8,14 @@ An ill-documented Docker image that runs the latest Puppet 4 Server from the RHE
 Running it is as simple as:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:latest
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-1
 ```
 
 As simple as that. Default values are assumed mirroring the SystemD unit provided by Puppet Labs, meaning that the JVM
 will allocate 2 GiB of minimum and maximum heap size. This can be tweaked with the `JAVA_ARGS` environment variable:
 
 ```
-sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:latest
+sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-1
 ```
 
 Drop in configuration using Docker volume mounts to your host. Files should be owned by the `puppet` user which has UID
@@ -28,7 +28,7 @@ container on start:
 
 ```
 sudo docker run --name puppetserver --hostname puppetserver -p 8140:8140 \
-    rfkrocktk/puppetserver:latest
+    rfkrocktk/puppetserver:1.1.3-1
 ```
 
 Now that the container is running, we can acquire a shell using the Docker `exec` command:
