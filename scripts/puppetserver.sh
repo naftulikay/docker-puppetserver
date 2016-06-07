@@ -13,7 +13,7 @@ SERVICE_STOP_RETRIES=60
 /usr/bin/install --directory --owner=puppet --group=puppet --mode=775 /var/run/puppetlabs/puppetserver
 
 # set ownership on var directory
-chown puppet /var/lib/puppet
+chown -R puppet:puppet /var/lib/puppet/
 
 # copied from SystemD unit provided by puppet server
 exec sudo -u puppet -H /usr/bin/java $JAVA_ARGS '-XX:OnOutOfMemoryError=kill -9 %%p' -Djava.security.egd=/dev/urandom \
