@@ -1,0 +1,8 @@
+.git/
+.vagrant/
+
+vagrant/
+
+LICENSE
+README.md
+Vagrantfile
