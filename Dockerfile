@@ -5,7 +5,7 @@ ENV LANG en_US.UTF-8
 
 ENV PUPPET_SERVER_VERSION=2.4.0-1.el7
 
-ENV IMAGE_RELEASE=1
+ENV IMAGE_RELEASE=2
 
 # upgrade all packages for security vulnerabilities
 RUN yum upgrade -y >/dev/null
