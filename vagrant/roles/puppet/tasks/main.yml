@@ -4,8 +4,6 @@
    with_items:
        # old puppet master and puppet server 1
        - https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
-       # puppet server 2
-       - https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
  - name: install puppet packages
    yum: name={{ item }} state=latest
    with_items:

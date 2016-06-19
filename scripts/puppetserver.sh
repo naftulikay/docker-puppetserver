@@ -15,7 +15,7 @@ exec /usr/bin/java $JAVA_ARGS \
           -XX:+HeapDumpOnOutOfMemoryError \
           -XX:HeapDumpPath=/tmp \
           -Djava.security.egd=/dev/urandom \
-          -cp "${INSTALL_DIR}/puppet-server-release.jar" clojure.main \
+          -cp "${INSTALL_DIR}/puppet-server-release.jar:/etc/puppetserver/" clojure.main \
           -m puppetlabs.trapperkeeper.main \
           --config "${CONFIG}" \
           -b "${BOOTSTRAP_CONFIG}" $@
