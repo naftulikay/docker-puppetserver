@@ -89,6 +89,9 @@ Unless otherwise stated, files and directories are owned by user `puppet` and gr
 administrator create a similar user and group on the server with the same UID and GID so that it's easy to fix and
 maintain correct ownership.
 
+**NOTE:** In order for the Puppet Server to use volumes properly, the volumes must be created before starting the
+container the first time and must be owned by user `puppet` and group `puppet` where the UID and GID are `8140`.
+
 <table>
     <thead>
         <tr>
