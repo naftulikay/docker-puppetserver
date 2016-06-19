@@ -9,6 +9,9 @@ CONFIG="${CONFIG:-/etc/puppetlabs/puppetserver/conf.d}"
 BOOTSTRAP_CONFIG="${BOOTSTRAP_CONFIG:-/etc/puppetlabs/puppetserver/bootstrap.cfg}"
 SERVICE_STOP_RETRIES="${SERVICE_STOP_RETRIES:-60}"
 
+# set ownership on var directory
+chown -R puppet:puppet /var/lib/puppet/
+
 # copied from SystemD unit provided by puppet server
 exec /usr/bin/java $JAVA_ARGS \
     '-XX:OnOutOfMemoryError=kill -9 %%p' \
