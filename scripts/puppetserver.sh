@@ -7,7 +7,6 @@ JAVA_ARGS="${JAVA_ARGS:--Xms2g -Xmx2g -XX:MaxPermSize=256m}"
 INSTALL_DIR="/usr/share/puppetserver"
 CONFIG="${CONFIG:-/etc/puppetserver/conf.d}"
 BOOTSTRAP_CONFIG="${BOOTSTRAP_CONFIG:-/etc/puppetserver/bootstrap.cfg}"
-SERVICE_STOP_RETRIES=60
 
 # copied from SystemD unit provided by puppet server
 exec /usr/bin/java $JAVA_ARGS \

@@ -1,9 +1,22 @@
 docker-puppetserver
 ===================
 
-An ill-documented Docker image that runs the latest Puppet 4 Server from the RHEL 7 Puppet Labs repository.
+A Docker image that runs the latest Puppet Server 1 from the RHEL 7 Puppet Labs repository.
 
-## Run It
+The `develop/1.x` branch is for development on Puppet Server 1 images, and anything that makes it into the
+`releases/1.x` branch can be considered a release.
+
+This image is baked with the following useful Puppet utilities:
+
+ - Ruby 2.0.0 (`/usr/bin/ruby`)
+ - `r10k`
+ - `librarian-puppet`
+ - `git`
+ - `bundler`
+ - `rake`
+ - Build utilities such as `make` and `gcc` for native Ruby extension compilation.
+
+## Running
 
 Running it is as simple as:
 
@@ -18,8 +31,105 @@ will allocate 2 GiB of minimum and maximum heap size. This can be tweaked with t
 sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-3
 ```
 
-Drop in configuration using Docker volume mounts to your host. Files should be owned by the `puppet` user which has UID
-of `52`. The Puppet Server will run as `puppet` with reduced privileges because I like to sleep at night.
+Configuration can be dropped into the machine using volumes, documented below. The container's defined `ENTRYPOINT`
+passes all arguments to the Puppet Server process, therefore to run the server in debug mode:
+
+```
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-3 -d
+```
+
+The final `-d` is passed into the Puppet Server's start arguments, putting the server in debug mode with more verbose
+logging.
+
+### Logging
+
+All logging is done straight to standard output. JSON logging for Puppet Server 1 is not possible, as the Logstash
+JSON adapter is only provided in Puppet Server 2.
+
+### Security
+
+The Puppet Server is started as the `puppet` user with a UID of `8140` as mentioned in the "Volumes" section below.
+
+If the Puppet Server process is compromised due to a security bug, `root` access won't be immediately possible
+without a privilege escalation attack on the kernel.
+
+### Environment Variables
+
+There are a few environment variables used in starting the Puppet Server, but only one is directly relevant to users
+of this container.
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><pre>JAVA_ARGS</pre></td>
+            <td><pre>-Xms2g -Xmx2g -XX:MaxPermSize=256m</td>
+            <td>
+                <p>JVM arguments to pass directly to the Java process on boot.</p>
+                <p>The defaults here are the same as given in the SystemD unit that ships with Puppet Server 1.
+                   It is recommended to give at least 2GiB of RAM to the Puppet Server.</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+### Volumes
+
+There are a number of useful volumes that you'll likely want to mount on your host to persist data across restarts
+of the container.
+
+Unless otherwise stated, files and directories are owned by user `puppet` and group `puppet`, with a UID and GID of
+`8140`, the same as the port the Puppet Server binds to. To maintain correct file ownership, it is recommended that the
+administrator create a similar user and group on the server with the same UID and GID so that it's easy to fix and
+maintain correct ownership.
+
+<table>
+    <thead>
+        <tr>
+            <th>Container Path</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><pre>/srv/puppet/deploy</pre></td>
+            <td>
+                <p>A good place to stage your <code>r10k</code> deployments from. Bind mount this somewhere on your host
+                   and have this directory be the root directory for the local working copy of the Git repository used
+                   as the Puppet codebase.</p>
+                <p><code>/srv/puppet</code> is the home directory for the <code>puppet</code> user, so if this directory
+                   is directly mounted as a volume, certain files may be clobbered in the user's home directory.</p>
+            </td>
+        </tr>
+        <tr>
+            <td><pre>/etc/puppet</pre></td>
+            <td>
+                <p>Root directory for Puppet configuration.</p>
+                <p>If you plan on doing <code>r10k</code> deployments, it is advised to mount this externally on the
+                   host so that deployed code exists across container restarts.</p>
+            </td>
+        </tr>
+        <tr>
+            <td><pre>/etc/puppetserver</pre></td>
+            <td>
+                <p>Root directory for Puppet Server configuration.</p>
+            </td>
+        </tr>
+        <tr>
+            <td><pre>/var/lib/puppet</pre></td>
+            <td>
+                <p>Data directory for the Puppet Server.</p>
+                <p>This directory will normally contain TLS certificates and other server data.</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 ## Getting Shell
 
@@ -35,7 +145,7 @@ Now that the container is running, we can acquire a shell using the Docker `exec
 
 ```
 $ sudo docker exec -it puppetserver bash
-[root@puppetserver /]# echo "I am G$(test $EUID == 0 && echo root || id -n)"
+[puppet@puppetserver /srv/puppet]$
 ```
 
 Sign away, young champion.
@@ -64,6 +174,9 @@ ENV IMAGE_RELEASE=2
 # upgrade all packages
 RUN yum upgrade -y >/dev/null
 ```
+
+Another reason that the `IMAGE_RELEASE` version may not correspond to the package's release version is in case of
+image-specific bug fixes or improvements.
 
  [heartbleed]: http://heartbleed.com/
  [glibc-bug]: https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2015-0235
