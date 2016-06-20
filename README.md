@@ -16,26 +16,29 @@ This image is baked with the following useful Puppet utilities:
  - `rake`
  - Build utilities such as `make` and `gcc` for native Ruby extension compilation.
 
+A fully-functioning SystemD unit exists in the examples directory. If you're on RHEL 7, it's probably the quickest
+way to get started.
+
 ## Running
 
 Running it is as simple as:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-3
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-4
 ```
 
 As simple as that. Default values are assumed mirroring the SystemD unit provided by Puppet Labs, meaning that the JVM
 will allocate 2 GiB of minimum and maximum heap size. This can be tweaked with the `JAVA_ARGS` environment variable:
 
 ```
-sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-3
+sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-4
 ```
 
 Configuration can be dropped into the machine using volumes, documented below. The container's defined `ENTRYPOINT`
 passes all arguments to the Puppet Server process, therefore to run the server in debug mode:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-3 -d
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-4 -d
 ```
 
 The final `-d` is passed into the Puppet Server's start arguments, putting the server in debug mode with more verbose
@@ -52,6 +55,19 @@ The Puppet Server is started as the `puppet` user with a UID of `8140` as mentio
 
 If the Puppet Server process is compromised due to a security bug, `root` access won't be immediately possible
 without a privilege escalation attack on the kernel.
+
+For ease of configuration, [`--net host`][docker-net-host] is possible, but not recommended. If not using `--net host`,
+port 8140 must be forwarded to the host and the host's hostname must be passed into the container using the `--hostname`
+parameter to `docker run`.
+
+Examples:
+
+```
+# the secure way, you should do it this way
+sudo /usr/bin/docker run -p 8140:8140 --hostname $(hostname) rfkrocktk/puppetserver:1.1.3-4
+# the insecure way, don't do it this way unless you understand and accept the risks
+sudo /usr/bin/docker run --net host rfkrocktk/puppetserver:1.1.3-4
+```
 
 ### Environment Variables
 
@@ -141,7 +157,7 @@ container on start:
 
 ```
 sudo docker run --name puppetserver --hostname puppetserver -p 8140:8140 \
-    rfkrocktk/puppetserver:1.1.3-3
+    rfkrocktk/puppetserver:1.1.3-4
 ```
 
 Now that the container is running, we can acquire a shell using the Docker `exec` command:
@@ -183,3 +199,4 @@ image-specific bug fixes or improvements.
 
  [heartbleed]: http://heartbleed.com/
  [glibc-bug]: https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2015-0235
+ [docker-net-host]: https://docs.docker.com/engine/reference/run/#network-host
