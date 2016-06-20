@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false" scan="true">
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <file>/var/log/puppetserver/puppetserver-access.log</file>
     <encoder>
         <pattern>%h %l %u %user %date "%r" %s %b %h %a %localPort %D</pattern>
     </encoder>

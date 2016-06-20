@@ -5,7 +5,7 @@ ENV LANG en_US.UTF-8
 
 ENV PUPPET_SERVER_VERSION=1.1.3-1.el7
 
-ENV IMAGE_RELEASE=3
+ENV IMAGE_RELEASE=4
 
 # upgrade all packages for security vulnerabilities
 RUN yum upgrade -y >/dev/null
@@ -42,18 +42,19 @@ RUN install --directory --owner=puppet --group=puppet --mode=0775 /var/run/puppe
     install --directory --owner=puppet --group=puppet --mode=0770 /srv/puppet/deploy && \
      chown -R puppet:puppet /etc/puppetserver /var/lib/puppet /usr/share/puppetserver
 
+# backup configuration files
+RUN install -d -m 0755 -o puppet -g puppet /usr/share/puppet{,server}/backup/etc && \
+    cp -r /etc/puppet/* /usr/share/puppet/backup/etc && \
+    cp -r /etc/puppetserver/* /usr/share/puppetserver/backup/etc/ && \
+    chown -R puppet:puppet /usr/share/puppet{,server}/backup/etc/
+
 # install puppet start script
 ADD scripts/puppetserver.sh /usr/local/bin/start-puppet-server
 RUN chmod 0775 /usr/local/bin/start-puppet-server
 
 # define volumes
-# configuration files
-VOLUME /etc/puppet
-VOLUME /etc/puppetserver
-# do your r10k/rake/bundle deploys from here
-VOLUME /srv/puppet/deploy
-# puppet data, possibly including TLS certs
-VOLUME /var/lib/puppet
+# configuration files, deploy dir, puppet data dir
+VOLUME ["/etc/puppet", "/etc/puppetmaster", "/srv/puppet/deploy", "/var/lib/puppet"]
 
 # expose puppet server port
 EXPOSE 8140
