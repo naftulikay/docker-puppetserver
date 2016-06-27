@@ -7,6 +7,11 @@ function restore-backup-files() {
     source_dir="$1"
     dest_dir="$2"
 
+    if [ -f "$dest_dir/.norestore" ]; then
+        # don't restore anything into this directory.
+        return 0;
+    fi
+
     # create directories if they don't exist
     find $source_dir -mindepth 1 -type d | sort | while read d ; do
         trimmed_d="$(echo $d | sed "s:$source_dir/::g")"

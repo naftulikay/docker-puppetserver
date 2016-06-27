@@ -24,21 +24,21 @@ way to get started.
 Running it is as simple as:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-4
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-5
 ```
 
 As simple as that. Default values are assumed mirroring the SystemD unit provided by Puppet Labs, meaning that the JVM
 will allocate 2 GiB of minimum and maximum heap size. This can be tweaked with the `JAVA_ARGS` environment variable:
 
 ```
-sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-4
+sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:1.1.3-5
 ```
 
 Configuration can be dropped into the machine using volumes, documented below. The container's defined `ENTRYPOINT`
 passes all arguments to the Puppet Server process, therefore to run the server in debug mode:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-4 -d
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:1.1.3-5 -d
 ```
 
 The final `-d` is passed into the Puppet Server's start arguments, putting the server in debug mode with more verbose
@@ -64,9 +64,9 @@ Examples:
 
 ```
 # the secure way, you should do it this way
-sudo /usr/bin/docker run -p 8140:8140 --hostname $(hostname) rfkrocktk/puppetserver:1.1.3-4
+sudo /usr/bin/docker run -p 8140:8140 --hostname $(hostname) rfkrocktk/puppetserver:1.1.3-5
 # the insecure way, don't do it this way unless you understand and accept the risks
-sudo /usr/bin/docker run --net host rfkrocktk/puppetserver:1.1.3-4
+sudo /usr/bin/docker run --net host rfkrocktk/puppetserver:1.1.3-5
 ```
 
 ### Environment Variables
@@ -150,6 +150,12 @@ container the first time and must be owned by user `puppet` and group `puppet` w
     </tbody>
 </table>
 
+Please note that the startup script will restore missing files and directories to the configuration directories on
+server start. This is to make life with volumes less of a nightmare. The script will _not_ overwrite existing files.
+However, it may recreate deleted files. If you see files show up again that shouldn't, please create a file named
+`.norestore` in `/etc/puppet` and `/etc/puppetserver` as necessary and this will prevent the script from recreating
+deleted files.
+
 ## Getting Shell
 
 If you need to acquire shell to your Puppet Server to e.g. sign certificates, this can be easily done by naming your
@@ -157,7 +163,7 @@ container on start:
 
 ```
 sudo docker run --name puppetserver --hostname puppetserver -p 8140:8140 \
-    rfkrocktk/puppetserver:1.1.3-4
+    rfkrocktk/puppetserver:1.1.3-5
 ```
 
 Now that the container is running, we can acquire a shell using the Docker `exec` command:

@@ -4,8 +4,9 @@ MAINTAINER Naftuli Tzvi Kay <rfkrocktk@gmail.com>
 ENV LANG en_US.UTF-8
 
 ENV PUPPET_SERVER_VERSION=1.1.3-1.el7
+ENV PUPPETDB_TERMINUS_VERSION=2.3.8-1.el7
 
-ENV IMAGE_RELEASE=4
+ENV IMAGE_RELEASE=5
 
 # upgrade all packages for security vulnerabilities
 RUN yum upgrade -y >/dev/null
@@ -22,6 +23,7 @@ RUN rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm >/dev
 
 # install puppet server and ruby
 RUN yum install -y puppetserver-$PUPPET_SERVER_VERSION \
+     puppetdb-terminus-$PUPPETDB_TERMINUS_VERSION \
      ruby ruby-devel rubygems rubygems-devel make git gcc >/dev/null
 # test it installed everything
 RUN test -e /usr/bin/ruby && \
@@ -54,7 +56,7 @@ RUN chmod 0775 /usr/local/bin/start-puppet-server
 
 # define volumes
 # configuration files, deploy dir, puppet data dir
-VOLUME ["/etc/puppet", "/etc/puppetmaster", "/srv/puppet/deploy", "/var/lib/puppet"]
+VOLUME ["/etc/puppet", "/etc/puppetserver", "/srv/puppet/deploy", "/var/lib/puppet"]
 
 # expose puppet server port
 EXPOSE 8140
