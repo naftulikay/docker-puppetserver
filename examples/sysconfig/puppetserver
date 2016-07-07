@@ -1,0 +1,4 @@
+# it's probably best to generate this value from a template
+PUPPET_HOSTNAME=puppet1.domain.com
+# allocate a static 2GiB for the Puppet Server
+JAVA_ARGS=-Xms2g -Xmx2g
