@@ -4,25 +4,27 @@ MAINTAINER Naftuli Tzvi Kay <rfkrocktk@gmail.com>
 ENV LANG en_US.UTF-8
 
 ENV PUPPET_SERVER_VERSION=2.4.0-1.el7
+ENV PUPPETDB_TERMINUS_VERSION=2.3.8-1.el7
 
-ENV IMAGE_RELEASE=2
+ENV IMAGE_RELEASE=3
 
 # upgrade all packages for security vulnerabilities
 RUN yum upgrade -y >/dev/null
 
-# install epel repository and sudo
-RUN yum install -y epel-release sudo >/dev/null
+# install epel repository
+RUN yum install -y epel-release >/dev/null
 
 # preemptively create the puppet user and group
 RUN groupadd -g 8140 -r puppet && \
-    useradd -u 8140 -g 8140 -r -s /bin/false puppet
+    useradd -u 8140 -g 8140 -r -s /usr/sbin/nologin puppet
 
 # install puppetlabs server repository
 RUN rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm >/dev/null
 
 # install puppet server and ruby
 RUN yum install -y puppetserver-$PUPPET_SERVER_VERSION \
-    ruby ruby-devel rubygems rubygems-devel >/dev/null
+    puppetdb-terminus-$PUPPETDB_TERMINUS_VERSION \
+    ruby ruby-devel rubygems rubygems-devel make git gcc >/dev/null
 # test it installed everything
 RUN test -e /usr/bin/ruby && \
     test -e /usr/bin/gem && \
@@ -30,9 +32,9 @@ RUN test -e /usr/bin/ruby && \
     test -d /opt/puppetlabs/server
 
 # install bundle, rake, and r10k deployment tools
-RUN gem install bundler rake r10k librarian-puppet >/dev/null
+RUN gem install bundler rake >/dev/null
 # test that it installed everything
-RUN for i in bundle rake r10k librarian-puppet ; do \
+RUN for i in bundle rake ; do \
         set -e ; test -f /usr/local/bin/$i ; \
     done
 
@@ -41,7 +43,15 @@ ADD files/logback.xml files/request-logging.xml /etc/puppetlabs/puppetserver/
 
 # create and chown directories
 RUN install --directory --owner=puppet --group=puppet --mode=0775 /var/run/puppetlabs/puppetserver && \
-    chown -R puppet:puppet /etc/puppetlabs/puppet /etc/puppetlabs/code /etc/puppetlabs/puppetserver
+    install --directory --owner=puppet --group=puppet --mode=0770 /srv/puppet/deploy && \
+    chown -R puppet:puppet /etc/puppetlabs/puppet /etc/puppetlabs/code /etc/puppetlabs/puppetserver /srv/puppet
+
+# backup configuration files
+RUN install -d -m 0755 -o puppet -g puppet /usr/share/puppet{,server,code}/backup/etc && \
+    cp -r /etc/puppetlabs/puppet/* /usr/share/puppet/backup/etc && \
+    cp -r /etc/puppetlabs/puppetserver/* /usr/share/puppetserver/backup/etc/ && \
+    cp -r /etc/puppetlabs/code/* /usr/share/puppetcode/backup/etc/ && \
+    chown -R puppet:puppet /usr/share/puppet{,server,code}/backup/etc/
 
 # install puppet start script
 ADD scripts/puppetserver.sh /usr/local/bin/start-puppet-server
@@ -55,6 +65,9 @@ EXPOSE 8140
 
 # run everything as puppet user
 USER puppet
+
+# volumes
+VOLUME ["/etc/puppetlabs/puppet", "/etc/puppetlabs/code", "/etc/puppetlabs/puppetserver", "/srv/puppet/deploy"]
 
 # start puppet server
 ENTRYPOINT ["/usr/local/bin/start-puppet-server"]
