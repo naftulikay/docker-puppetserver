@@ -1,0 +1,27 @@
+[Unit]
+Description=Puppet Server Docker Container
+# start after docker has started
+After=docker.service
+Requires=docker.service
+
+[Service]
+# always restart this service, waiting 5 seconds between auto-restarts
+Restart=always
+RestartSec=5
+# puppet server exits 143 on successful shutdown - https://tickets.puppetlabs.com/browse/SERVER-70
+SuccessExitStatus=143
+# source environment variables from /etc/sysconfig/puppetserver
+EnvironmentFile=/etc/sysconfig/puppetserver
+# create the volume directories with right ownership and permissions
+ExecStartPre=-/usr/bin/install -d 0755 -o 8140 -g 8140 /etc/puppetlabs/puppet/ /etc/puppetlabs/puppetserver \
+    /etc/puppetlabs/code /srv/puppetcode
+# start the container, mounting volumes and exposing port 8140
+ExecStart=/usr/bin/docker run --name puppetserver -v /etc/puppetlabs/puppet:/etc/puppetlabs/puppet \
+    -v /etc/puppetlabs/puppetserver:/etc/puppetlabs/puppetserver -v /etc/puppetlabs/code:/etc/puppetlabs/code \
+    -v /srv/puppetcode:/srv/puppet/deploy -p 8140:8140 --hostname $PUPPET_HOSTNAME \
+    --env-file /etc/sysconfig/puppetserver rfkrocktk/puppetserver:2.4.0-3
+# remove the container's temporary volumes after the process has exited
+ExecStopPost=-/usr/bin/docker rm -v puppetserver
+
+[Install]
+WantedBy=multi-user.target
