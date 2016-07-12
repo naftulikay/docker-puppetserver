@@ -22,21 +22,21 @@ way to get started.
 Running it is as simple as:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:2.4.0-3
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:2.4.0-4
 ```
 
 As simple as that. Default values are assumed mirroring the SystemD unit provided by Puppet Labs, meaning that the JVM
 will allocate 2 GiB of minimum and maximum heap size. This can be tweaked with the `JAVA_ARGS` environment variable:
 
 ```
-sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:2.4.0-3
+sudo docker run -it -p 8140:8140 -e JAVA_ARGS="-Xms4g -Xmx4g" rfkrocktk/puppetserver:2.4.0-4
 ```
 
 Configuration can be dropped into the machine using volumes, documented below. The container's defined `ENTRYPOINT`
 passes all arguments to the Puppet Server process, therefore to run the server in debug mode:
 
 ```
-sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:2.4.0-3 -d
+sudo docker run -it -p 8140:8140 rfkrocktk/puppetserver:2.4.0-4 -d
 ```
 
 The final `-d` is passed into the Puppet Server's start arguments, putting the server in debug mode with more verbose
@@ -61,9 +61,9 @@ Examples:
 
 ```
 # the secure way, you should do it this way
-sudo /usr/bin/docker run -p 8140:8140 --hostname $(hostname) rfkrocktk/puppetserver:2.4.0-3
+sudo /usr/bin/docker run -p 8140:8140 --hostname $(hostname) rfkrocktk/puppetserver:2.4.0-4
 # the insecure way, don't do it this way unless you understand and accept the risks
-sudo /usr/bin/docker run --net host rfkrocktk/puppetserver:2.4.0-3
+sudo /usr/bin/docker run --net host rfkrocktk/puppetserver:2.4.0-4
 ```
 
 ### Environment Variables
@@ -160,7 +160,7 @@ container on start:
 
 ```
 sudo docker run --name puppetserver --hostname puppetserver -p 8140:8140 \
-    rfkrocktk/puppetserver:2.4.0-3
+    rfkrocktk/puppetserver:2.4.0-4
 ```
 
 Now that the container is running, we can acquire a shell using the Docker `exec` command:

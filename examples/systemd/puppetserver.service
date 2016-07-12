@@ -19,7 +19,7 @@ ExecStartPre=-/usr/bin/install -d 0755 -o 8140 -g 8140 /etc/puppetlabs/puppet/ /
 ExecStart=/usr/bin/docker run --name puppetserver -v /etc/puppetlabs/puppet:/etc/puppetlabs/puppet \
     -v /etc/puppetlabs/puppetserver:/etc/puppetlabs/puppetserver -v /etc/puppetlabs/code:/etc/puppetlabs/code \
     -v /srv/puppetcode:/srv/puppet/deploy -p 8140:8140 --hostname $PUPPET_HOSTNAME \
-    --env-file /etc/sysconfig/puppetserver rfkrocktk/puppetserver:2.4.0-3
+    --env-file /etc/sysconfig/puppetserver rfkrocktk/puppetserver:2.4.0-4
 # remove the container's temporary volumes after the process has exited
 ExecStopPost=-/usr/bin/docker rm -v puppetserver
 
