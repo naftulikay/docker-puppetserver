@@ -4,9 +4,9 @@ MAINTAINER Naftuli Tzvi Kay <rfkrocktk@gmail.com>
 ENV LANG en_US.UTF-8
 
 ENV PUPPET_SERVER_VERSION=2.4.0-1.el7
-ENV PUPPETDB_TERMINUS_VERSION=2.3.8-1.el7
+ENV PUPPETDB_TERMINI_VERSION=4.1.2-1.el7
 
-ENV IMAGE_RELEASE=3
+ENV IMAGE_RELEASE=4
 
 # upgrade all packages for security vulnerabilities
 RUN yum upgrade -y >/dev/null
@@ -23,7 +23,7 @@ RUN rpm -Uvh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm >
 
 # install puppet server and ruby
 RUN yum install -y puppetserver-$PUPPET_SERVER_VERSION \
-    puppetdb-terminus-$PUPPETDB_TERMINUS_VERSION \
+    puppetdb-termini-$PUPPETDB_TERMINI_VERSION \
     ruby ruby-devel rubygems rubygems-devel make git gcc >/dev/null
 # test it installed everything
 RUN test -e /usr/bin/ruby && \
